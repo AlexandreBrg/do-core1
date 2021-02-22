@@ -18,18 +18,16 @@ pub struct Instruction {
 
 #[derive(Debug)]
 pub struct Cpu {
-    registers: [u16; MAX_REGISTER_INDEX as usize + 1],
-    instruction: u16
+    registers: [u16; MAX_REGISTER_INDEX as usize + 1]
 }
 
 // do-core1 register indexes range from 0 to 7.
 pub const MAX_REGISTER_INDEX: u8 = 7;
 
 impl Cpu {
-    pub fn new(init_values: [u16; MAX_REGISTER_INDEX as usize +1], instruction: u16) -> Cpu {
+    pub fn new(init_values: [u16; MAX_REGISTER_INDEX as usize + 1]) -> Cpu {
         Cpu {
-            registers: init_values.clone(),
-            instruction
+            registers: init_values.clone()
         }
     }
 
@@ -40,8 +38,8 @@ impl Cpu {
         }
     }
 
-    pub fn run(&mut self) -> Result<(), Error> {
-        let decoded_instruction = Instruction::disassemble(self.instruction)?;
+    pub fn process(&mut self, insn: u16) -> Result<(), Error> {
+        let decoded_instruction = Instruction::disassemble(insn)?;
         println!("do-core-1: instruction decoded into {:?}", decoded_instruction);
         let op0 = decoded_instruction.op0 as usize;
         let op1 = decoded_instruction.op1 as usize;
@@ -49,7 +47,10 @@ impl Cpu {
         match decoded_instruction.opcode {
             OpCode::ADD => self.registers[op0] = self.add(self.registers[op0], self.registers[op1])?,
             OpCode::XOR => self.registers[op0] = self.xor(self.registers[op0], self.registers[op1]),
-            _ => panic!("Unknown opcode {:?}", decoded_instruction.opcode),
+            // OpCode::LD must fetch data from the memory
+            OpCode::LD => (),
+            // OpCode::ST must store into the memory
+            OpCode::ST => ()
         }
         Ok(())
     }
@@ -63,7 +64,6 @@ impl Cpu {
         op0 ^ op1
     }
 }
-
 
 impl Instruction {
     // Instruction constructor, a.k.a. disassembler.

@@ -48,11 +48,11 @@ fn main() -> Result<(), Error> {
     // Convert an hexadecimal formatted string into a u16
     let insn = u16::from_str_radix(insn_string, 16).unwrap();
     let registers = get_init_values();
-    let mut cpu = Cpu::new(registers, insn);
+    let mut cpu = Cpu::new(registers);
 
     cpu.dump_state("Initial CPU State");
 
-    cpu.run()?;
+    cpu.process(insn)?;
 
     cpu.dump_state("Final CPU State");
 
