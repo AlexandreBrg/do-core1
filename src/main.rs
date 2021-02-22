@@ -50,11 +50,11 @@ fn main() -> Result<(), Error> {
     let registers = get_init_values();
     let mut cpu = Cpu::new(registers, insn);
 
-    cpu.dump("Initial CPU State");
+    cpu.dump_state("Initial CPU State");
 
     cpu.run()?;
 
-    cpu.dump("Final CPU State");
+    cpu.dump_state("Final CPU State");
 
     Ok(())
 }

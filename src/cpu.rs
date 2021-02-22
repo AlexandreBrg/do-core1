@@ -33,7 +33,7 @@ impl Cpu {
         }
     }
 
-    pub fn dump(&self, preamble: &str) {
+    pub fn dump_state(&self, preamble: &str) {
         println!("do-core1: {}", preamble);
         for (index, register) in self.registers.iter().enumerate() {
             println!("\tR{}: {:#x?}", index, *register);
