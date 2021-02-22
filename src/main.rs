@@ -81,6 +81,7 @@ fn main() -> Result<(), Error> {
         .arg(
             Arg::with_name("instruction")
                 .long("instruction")
+                .short("i")
                 .help("do-core1 instruction to execute")
                 .takes_value(true),
         )
