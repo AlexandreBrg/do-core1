@@ -1,9 +1,10 @@
 mod cpu;
+mod memory;
 
 extern crate clap;
 use clap::{App, Arg};
 use crate::cpu::Cpu;
-use crate::cpu::MAX_REGISTER_INDEX;
+use crate::memory::Memory;
 
 #[derive(Debug)]
 pub enum Error {
@@ -11,14 +12,7 @@ pub enum Error {
     Op0OutOfRange,
     Op1OutOfRange,
     AdditionOverflow(u16, u16),
-}
-
-fn get_init_values() -> [u16; MAX_REGISTER_INDEX as usize +1] {
-    let mut registers = [0u16; MAX_REGISTER_INDEX as usize + 1];
-    for (index, register) in registers.iter_mut().enumerate() {
-        *register = index as u16 * 0x10;
-    }
-    registers
+    MemoryEmpty(u8)
 }
 
 fn main() -> Result<(), Error> {
@@ -47,14 +41,16 @@ fn main() -> Result<(), Error> {
 
     // Convert an hexadecimal formatted string into a u16
     let insn = u16::from_str_radix(insn_string, 16).unwrap();
-    let registers = get_init_values();
-    let mut cpu = Cpu::new(registers);
+    let memory = Memory::new();
+    let mut cpu = Cpu::new(memory);
 
     cpu.dump_state("Initial CPU State");
+    cpu.memory.dump("Initial Memory State");
 
     cpu.process(insn)?;
 
     cpu.dump_state("Final CPU State");
+    cpu.memory.dump("Final Memory State");
 
     Ok(())
 }

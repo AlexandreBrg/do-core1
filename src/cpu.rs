@@ -1,4 +1,5 @@
 use crate::{Error};
+use crate::memory::Memory;
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
@@ -18,6 +19,7 @@ pub struct Instruction {
 
 #[derive(Debug)]
 pub struct Cpu {
+    pub memory: Memory,
     registers: [u16; MAX_REGISTER_INDEX as usize + 1]
 }
 
@@ -25,9 +27,10 @@ pub struct Cpu {
 pub const MAX_REGISTER_INDEX: u8 = 7;
 
 impl Cpu {
-    pub fn new(init_values: [u16; MAX_REGISTER_INDEX as usize + 1]) -> Cpu {
+    pub fn new(memory: Memory) -> Cpu {
         Cpu {
-            registers: init_values.clone()
+            registers: get_register_zeros(),
+            memory
         }
     }
 
@@ -47,10 +50,8 @@ impl Cpu {
         match decoded_instruction.opcode {
             OpCode::ADD => self.registers[op0] = self.add(self.registers[op0], self.registers[op1])?,
             OpCode::XOR => self.registers[op0] = self.xor(self.registers[op0], self.registers[op1]),
-            // OpCode::LD must fetch data from the memory
-            OpCode::LD => (),
-            // OpCode::ST must store into the memory
-            OpCode::ST => ()
+            OpCode::LD => self.registers[op0] = self.memory.load(op1 as u8)?,
+            OpCode::ST => self.memory.store(op0 as u8, op1 as u16)?
         }
         Ok(())
     }
@@ -94,6 +95,14 @@ impl OpCode {
             _ => Err(Error::InvalidOpCode(opcode)),
         }
     }
+}
+
+fn get_register_zeros() -> [u16; MAX_REGISTER_INDEX as usize +1] {
+    let mut registers = [0u16; MAX_REGISTER_INDEX as usize + 1];
+    for (_, register) in registers.iter_mut().enumerate() {
+        *register = 0x00;
+    }
+    registers
 }
 
 #[cfg(test)]
