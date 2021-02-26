@@ -8,7 +8,7 @@ pub struct Memory {
 impl Memory {
     pub fn new() -> Memory {
         Memory {
-            slots: get_memory()
+            slots: [0u16; MAX_MEMORY_SIZE / 16]
         }
     }
 
@@ -20,7 +20,7 @@ impl Memory {
     pub fn load(&self, addr: u8) -> Result<u16, Error> {
         match self.slots.get(addr as usize) {
             Some(value) => Ok(value.clone()),
-            _ => Err(Error::MemoryEmpty(addr))
+            _ => Err(Error::StackOverflow(addr as usize))
         }
     }
 
@@ -35,26 +35,10 @@ impl Memory {
     }
 }
 
-fn get_memory() -> [u16; MAX_MEMORY_SIZE / 16] {
-    let mut slots = [0u16; MAX_MEMORY_SIZE / 16];
-    for (_, slot) in slots.iter_mut().enumerate() {
-        *slot = 0x00;
-    }
-    slots
-}
-
 #[cfg(test)]
 mod tests {
     use crate::Error;
     use crate::memory::Memory;
-
-    #[test]
-    fn test_load_empty_memory() -> Result<(), Error> {
-        let memory = Memory::new();
-
-        assert!(memory.load(0x01).is_err());
-        Ok(())
-    }
 
     #[test]
     fn test_store_and_load() -> Result<(), Error> {

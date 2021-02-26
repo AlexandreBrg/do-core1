@@ -17,7 +17,7 @@ pub enum Error {
     Op0OutOfRange,
     Op1OutOfRange,
     AdditionOverflow(u16, u16),
-    MemoryEmpty(u8)
+    StackOverflow(usize)
 }
 
 fn main() -> Result<(), Error> {
