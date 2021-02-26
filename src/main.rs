@@ -6,6 +6,11 @@ use clap::{App, Arg};
 use crate::cpu::Cpu;
 use crate::memory::Memory;
 
+// do-core1 register indexes range from 0 to 7.
+pub const MAX_REGISTER_INDEX: u8 = 7;
+// do-core1 memory size is 4096Kb
+pub const MAX_MEMORY_SIZE: usize = 4096;
+
 #[derive(Debug)]
 pub enum Error {
     InvalidOpCode(u8),
