@@ -48,8 +48,8 @@ impl Cpu {
         match decoded_instruction.opcode {
             OpCode::ADD => self.registers[op0] = self.add(self.registers[op0], self.registers[op1])?,
             OpCode::XOR => self.registers[op0] = self.xor(self.registers[op0], self.registers[op1]),
-            OpCode::LD => self.registers[op0] = self.memory.load(op1 as u8)?,
-            OpCode::ST => self.memory.store(op0 as u8, op1 as usize)?
+            OpCode::LD => self.registers[op0] = self.memory.load(op1)?,
+            OpCode::ST => self.memory.store(op0, op1 as usize)?
         }
         Ok(())
     }

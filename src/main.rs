@@ -10,6 +10,8 @@ use crate::memory::Memory;
 pub const MAX_REGISTER_INDEX: u8 = 7;
 // do-core1 memory size is 4096Kb
 pub const MAX_MEMORY_SIZE: usize = 4096;
+// do-core1 memory slots available
+pub const MAX_MEMORY_SLOTS: usize = MAX_MEMORY_SIZE / 16;
 
 #[derive(Debug)]
 pub enum Error {
@@ -17,7 +19,9 @@ pub enum Error {
     Op0OutOfRange,
     Op1OutOfRange,
     AdditionOverflow(u16, u16),
-    StackOverflow(usize)
+    StackOverflow(usize),
+    AddressOutOfRange(usize),
+    ValueOutOfRange(usize)
 }
 
 fn main() -> Result<(), Error> {

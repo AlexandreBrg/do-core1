@@ -1,4 +1,5 @@
-use crate::{Error, MAX_MEMORY_SIZE};
+use crate::{Error, MAX_MEMORY_SIZE, MAX_MEMORY_SLOTS};
+use std::convert::TryFrom;
 
 #[derive(Debug)]
 pub struct Memory {
@@ -12,13 +13,25 @@ impl Memory {
         }
     }
 
-    pub fn store(&mut self, addr: u8, value: usize) -> Result<(), Error> {
-        self.slots[addr as usize] = value as u16;
+    pub fn store(&mut self, addr: usize, value: usize) -> Result<(), Error> {
+
+        if addr > MAX_MEMORY_SLOTS {
+            return Err(Error::AddressOutOfRange(addr));
+        }
+
+        self.slots[addr] = match u16::try_from(value) {
+            Err(_) => return Err(Error::ValueOutOfRange(value)),
+            Ok(u16_value) => u16_value,
+        };
         Ok(())
     }
 
-    pub fn load(&self, addr: u8) -> Result<u16, Error> {
-        match self.slots.get(addr as usize) {
+    pub fn load(&self, addr: usize) -> Result<u16, Error> {
+        if addr.gt(&MAX_MEMORY_SLOTS)  {
+            return Err(Error::AddressOutOfRange(addr));
+        }
+
+        match self.slots.get(addr) {
             Some(value) => Ok(value.clone()),
             _ => Err(Error::StackOverflow(addr as usize))
         }
@@ -47,6 +60,27 @@ mod tests {
         memory.store(0x00, 0x01)?;
         assert_eq!(memory.load(0x00)?, 0x01);
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_store_out_of_range() -> Result<(), Error> {
+        let mut memory = Memory::new();
+        assert!(memory.store(0xfff, 0x00).is_err());
+        Ok(())
+    }
+
+    #[test]
+    fn test_store_u32() -> Result<(), Error> {
+        let mut memory = Memory::new();
+        assert!(memory.store(0xff, u32::max_value() as usize).is_err());
+        Ok(())
+    }
+
+    #[test]
+    fn test_load_out_of_range() -> Result<(), Error> {
+        let memory = Memory::new();
+        assert!(memory.load(0xfff).is_err());
         Ok(())
     }
 }
