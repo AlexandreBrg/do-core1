@@ -34,13 +34,6 @@ fn main() -> Result<(), Error> {
                 .help("do-core1 instruction to execute")
                 .takes_value(true)
         )
-        .arg(
-            Arg::with_name("file")
-                .short("f")
-                .long("intructionsfile")
-                .help("do-core1 instructions file to execute")
-                .takes_value(true)
-        )
         .get_matches();
 
     let insn_string = arguments
