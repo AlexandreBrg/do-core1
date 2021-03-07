@@ -1,33 +1,33 @@
-use crate::{Error, MAX_MEMORY_SIZE, MAX_MEMORY_SLOTS};
+use crate::{Error, MAX_MEMORY_SIZE};
 use std::convert::TryFrom;
 
 #[derive(Debug)]
 pub struct Memory {
-    slots: [u16; (MAX_MEMORY_SIZE / 16) as usize]
+    slots: [u8; MAX_MEMORY_SIZE]
 }
 
 impl Memory {
     pub fn new() -> Memory {
         Memory {
-            slots: [0u16; MAX_MEMORY_SIZE / 16]
+            slots: [0u8; MAX_MEMORY_SIZE]
         }
     }
 
     pub fn store(&mut self, addr: usize, value: usize) -> Result<(), Error> {
 
-        if addr > MAX_MEMORY_SLOTS {
+        if addr > MAX_MEMORY_SIZE {
             return Err(Error::AddressOutOfRange(addr));
         }
 
-        self.slots[addr] = match u16::try_from(value) {
+        self.slots[addr] = match u8::try_from(value) {
             Err(_) => return Err(Error::ValueOutOfRange(value)),
-            Ok(u16_value) => u16_value,
+            Ok(u8_value) => u8_value,
         };
         Ok(())
     }
 
-    pub fn load(&self, addr: usize) -> Result<u16, Error> {
-        if addr.gt(&MAX_MEMORY_SLOTS)  {
+    pub fn load(&self, addr: usize) -> Result<u8, Error> {
+        if addr.gt(&MAX_MEMORY_SIZE)  {
             return Err(Error::AddressOutOfRange(addr));
         }
 
@@ -50,7 +50,7 @@ impl Memory {
 
 #[cfg(test)]
 mod tests {
-    use crate::Error;
+    use crate::{Error, MAX_MEMORY_SIZE};
     use crate::memory::Memory;
 
     #[test]
@@ -66,7 +66,7 @@ mod tests {
     #[test]
     fn test_store_out_of_range() -> Result<(), Error> {
         let mut memory = Memory::new();
-        assert!(memory.store(0xfff, 0x00).is_err());
+        assert!(memory.store(MAX_MEMORY_SIZE + 0x1, 0x00).is_err());
         Ok(())
     }
 
@@ -80,7 +80,7 @@ mod tests {
     #[test]
     fn test_load_out_of_range() -> Result<(), Error> {
         let memory = Memory::new();
-        assert!(memory.load(0xfff).is_err());
+        assert!(memory.load(MAX_MEMORY_SIZE + 0x1).is_err());
         Ok(())
     }
 }
